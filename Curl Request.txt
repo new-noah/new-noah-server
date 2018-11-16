@@ -1,0 +1,2 @@
+curl -i -X POST -H "Content-Type: multipart/form-data" -F "image=@/Users/itelenkov/Pictures/img1.jpg" http://localhost:3000/img
+curl -i -X POST -H "Content-Type: multipart/form-data" -F "data=@/Users/itelenkov/Pictures/img1.jpg" http://localhost:3000/img
