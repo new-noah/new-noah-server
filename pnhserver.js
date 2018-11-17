@@ -41,46 +41,39 @@ app.get('/get_images', function (req, res) {
   res.json([
       {
         name: "name 1",
-        url: "uploads/avatar-1542406728530.jpg"
+        url: "avatar-1542406728530.jpg"
       }, {
         name: "name 2",
-        url: "uploads/avatar-1542406728530.jpg"
+        url: "avatar-1542406728530.jpg"
       }
   ]);
 });
 
-app.get('/ipfs', function (req, res) {
-  console.log('ipfs');
+app.get('/uploads/:filename', function(req, res) {
+  console.log('get uploads');
+  console.log(req.params.filename);
   
-  node.files.cat("QmS9cBdHjFLqAeNK2XdenxNTWwZFCSK9kBCsqkqmcoDJ62", function (err, file) {
+  res.sendFile(__dirname + '/uploads/avatar-1542406728530.jpg')
+});
+
+
+//Get image from IPFS
+app.get('/get_image/:image_id', function (req, res) {
+  node.files.cat(req.params.image_id.split('.')[0], function (err, file) {
     
     if (err) {
         throw err
       }
-      
-    console.log(file.toString('utf8'))
-    
-    res.json([
-        {
-          name: "name 1",
-          url: "uploads/avatar-1542406728530.jpg",
-          file: file.toString('utf8')
-        }, {
-          name: "name 2",
-          url: "uploads/avatar-1542406728530.jpg",
-          file: file.toString('utf8')
-        }
-    ]);
+    res.setHeader("Content-Type", 'image/jpeg');
+    res.send(file);
   })
-  
-  
-});
-
+})
 
 app.post('/img', function (req, res, next) {
   // req.file - файл `img_source`
   // req.body сохранит текстовые поля, если они будут
-
+  console.log("Start upload");
+  console.log(req.avatar);
   upload(req, res, function (err) {
     if (err instanceof multer.MulterError) {
       // Случилась ошибка Multer при загрузке.
