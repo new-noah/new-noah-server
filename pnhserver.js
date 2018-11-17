@@ -10,9 +10,24 @@ const port = 3000
 const IPFS = require('ipfs')
 const node = new IPFS()
 
+const dcorejs = require('dcorejs');
+const config = {
+    dcoreNetworkWSPaths: ['wss://hackathon2.decent.ch:8090'],
+    chainId: '9c54faed15d4089d3546ac5eb0f1392434a970be15f1452ce1e7764f70f02936'
+};
+
+ 
+dcorejs.initialize(config, false);
+
 //-----------------
 
 const path = "uploads/database.json";
+
+const ion = "1.2.350"
+const rod = "1.2.367";
+
+const pkIon = "5KDqnXc2ZXRMB6xTLjUgDYisvriavyN9BPxGJ5ZXytVjoHHSBn1";
+const pkRod = "5JdXHn4AppfhqJYAWsCoBJsPPetDWVpdb7MryC4c48Hu8fVVraX";
 
 //----------------- 
 
@@ -55,6 +70,57 @@ app.get('/get_image/:image_id', function (req, res) {
     res.send(file);
   })
 })
+
+
+        
+app.get("/pay", function(req, res) {
+
+  dcorejs.account().transfer(100, "DCT", ion, rod, "Memo", pkIon)
+          .then(result => {
+              console.log('payment done success');
+              res.json({
+                  result: "ok"
+                })
+          })
+          .catch(err => {
+            console.log('payment failed');
+            console.log("error");
+              console.error(err);
+              res.json({
+                  result: "fail"
+                })
+          });
+
+});
+
+app.get("/get_user_balance", function(req, res) {
+  dcorejs.account().getBalance(ion)
+          .then(res1 => {
+              res.json({
+                result: "ok",
+                balance: res1
+              })
+          })
+          .catch(err => {
+              console.error(err);
+              // output.innerHTML = '<p style="color: red;">Error loading user account</p>';
+          });
+});
+
+app.get("/get_contract_balance", function(req, res) {
+  dcorejs.account().getBalance(rod)
+          .then(res1 => {
+              res.json({
+                result: "ok",
+                balance: res1
+              })
+          })
+          .catch(err => {
+              console.error(err);
+              // output.innerHTML = '<p style="color: red;">Error loading user account</p>';
+          });
+});
+
 
 //Upload image to IPFS
 app.post('/upload_image', function (req, res, next) {
