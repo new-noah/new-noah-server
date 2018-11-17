@@ -1,37 +1,22 @@
 const express = require('express')
+const fileUpload = require('express-fileupload');
+
 const util = require('util');
 const fs = require('fs');
-
-
-const multer = require('multer');
 
 const app = express()
 const port = 3000
 
 const IPFS = require('ipfs')
 const node = new IPFS()
- 
 
-var storage = multer.diskStorage({
-    destination: function (req, file, callback) {
-        callback(null, 'uploads/');
-    },
-    filename: function (req, file, callback) {
-        console.log(file.fieldname);
-        callback(null, file.fieldname + '-' + Date.now() + ".jpg");
-    }
-});
+ 
+app.use(fileUpload());
 
 node.on('ready', () => {
   console.log('ready ipfs');
-  // Ready to use!
-  // See https://github.com/ipfs/js-ipfs#core-api
-
 })
 
-// var upload = multer({ storage: storage });
-
-var upload = multer({ storage: storage }).single('avatar');
 
 app.get('/', function (req, res) {
   res.send('Rock! NOAH Server Stareted');
@@ -49,14 +34,6 @@ app.get('/get_images', function (req, res) {
   ]);
 });
 
-app.get('/uploads/:filename', function(req, res) {
-  console.log('get uploads');
-  console.log(req.params.filename);
-  
-  res.sendFile(__dirname + '/uploads/avatar-1542406728530.jpg')
-});
-
-
 //Get image from IPFS
 app.get('/get_image/:image_id', function (req, res) {
   node.files.cat(req.params.image_id.split('.')[0], function (err, file) {
@@ -69,24 +46,13 @@ app.get('/get_image/:image_id', function (req, res) {
   })
 })
 
-app.post('/img', function (req, res, next) {
-  // req.file - файл `img_source`
-  // req.body сохранит текстовые поля, если они будут
-  console.log("Start upload");
-  console.log(req);
-  upload(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      // Случилась ошибка Multer при загрузке.
-        res.send(err);
-    } else {
-      // При загрузке произошла неизвестная ошибка.
-    }
-
-    // Все прекрасно загрузилось.
-    res.send("file saved on server");
+//Upload image to IPFS
+app.post('/upload_image', function (req, res, next) {
+  node.files.add(req.files.avatar.data, function (err, file) {
+    res.json({
+      result: 'ok'
+    })
   });
-
-
 })
 
 
