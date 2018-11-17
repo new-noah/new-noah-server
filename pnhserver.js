@@ -10,7 +10,12 @@ const port = 3000
 const IPFS = require('ipfs')
 const node = new IPFS()
 
- 
+//-----------------
+
+const path = "uploads/database.json";
+
+//----------------- 
+
 app.use(fileUpload());
 
 node.on('ready', () => {
@@ -23,15 +28,20 @@ app.get('/', function (req, res) {
 });
 
 app.get('/get_images', function (req, res) {
-  res.json([
-      {
-        name: "name 1",
-        uri: "QmS9cBdHjFLqAeNK2XdenxNTWwZFCSK9kBCsqkqmcoDJ62"
-      }, {
-        name: "name 2",
-        uri: "QmS9cBdHjFLqAeNK2XdenxNTWwZFCSK9kBCsqkqmcoDJ62"
+  fs.readFile(path, handleFile)
+
+  // Write the callback function
+  function handleFile(err, data) {
+      var d;
+      if (err) {
+        res.json({
+          result: 'failed'
+        })
+      } else {
+        d = JSON.parse(data);
+        res.json(d);
       }
-  ]);
+  }
 });
 
 //Get image from IPFS
@@ -55,11 +65,35 @@ app.post('/upload_image', function (req, res, next) {
         result: "fail"
       })
     } else {
-      res.json({
-        uri: file[0].path,
-        size: file[0].size,
-        result: 'ok'
-      })
+      
+      fs.readFile(path, handleFile)
+
+      // Write the callback function
+      function handleFile(err, data) {
+          var d;
+          if (err) {
+            res.json({
+              result: 'failed'
+            })
+          } else {
+            d = JSON.parse(data);
+            console.log(d)
+            d.push({
+              name: 'asdasd',
+              uri: file[0].path
+            })
+            
+            fs.writeFile(path, JSON.stringify(d), 'utf8', function(err, res1) {
+              res.json({
+                uri: file[0].path,
+                size: file[0].size,
+                result: 'ok'
+              })
+            });
+          }
+      }
+      
+      
     }
     
   });
