@@ -49,9 +49,19 @@ app.get('/get_image/:image_id', function (req, res) {
 //Upload image to IPFS
 app.post('/upload_image', function (req, res, next) {
   node.files.add(req.files.avatar.data, function (err, file) {
-    res.json({
-      result: 'ok'
-    })
+    
+    if(err) {
+      res.json({
+        result: "fail"
+      })
+    } else {
+      res.json({
+        uri: file[0].path,
+        size: file[0].size,
+        result: 'ok'
+      })
+    }
+    
   });
 })
 
