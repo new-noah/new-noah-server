@@ -41,10 +41,10 @@ app.get('/get_images', function (req, res) {
   res.json([
       {
         name: "name 1",
-        url: "avatar-1542406728530.jpg"
+        uri: "QmS9cBdHjFLqAeNK2XdenxNTWwZFCSK9kBCsqkqmcoDJ62"
       }, {
         name: "name 2",
-        url: "avatar-1542406728530.jpg"
+        uri: "QmS9cBdHjFLqAeNK2XdenxNTWwZFCSK9kBCsqkqmcoDJ62"
       }
   ]);
 });
@@ -73,7 +73,7 @@ app.post('/img', function (req, res, next) {
   // req.file - файл `img_source`
   // req.body сохранит текстовые поля, если они будут
   console.log("Start upload");
-  console.log(req.avatar);
+  console.log(req);
   upload(req, res, function (err) {
     if (err instanceof multer.MulterError) {
       // Случилась ошибка Multer при загрузке.
